@@ -130,6 +130,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            width: 100%;
         }
 
         .movie-title {
@@ -231,7 +232,7 @@
     </header>
 
     <div class="search-container">
-        <input type="text" id="movieInput" placeholder="Movie ka naam likhein... (e.g., Inception, Jawan)">
+        <input type="text" id="movieInput" placeholder="Movie ka naam likhein... (e.g., Inception, Shiddat)">
         <button class="search-btn" id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
     </div>
 
@@ -268,9 +269,18 @@
         const movieYear = document.getElementById('movieYear');
         const qualityContainer = document.getElementById('qualityContainer');
 
+        // Check window location to dynamically route requests to localhost if on GitHub
+        const BACKEND_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' 
+            ? '' 
+            : 'http://127.0.0.1:5000';
+
         searchBtn.addEventListener('click', performSearch);
-        movieInput.addEventListener('keypress', (e) => {
-            if (e.key === 'key' || e.keyCode === 13) performSearch();
+        
+        // Mobile & Desktop Keyboard Enter Fix
+        movieInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
         });
 
         function performSearch() {
@@ -282,27 +292,24 @@
             mainContent.style.display = 'none';
             videoPlayer.src = "";
 
-            // Fetch Data from Backend API
-            fetch(`/api/search?query=${encodeURIComponent(query)}`)
+            // Fetch Data smoothly
+            fetch(`${BACKEND_URL}/api/search?query=${encodeURIComponent(query)}`)
                 .then(res => res.json())
                 .then(data => {
                     loader.style.display = 'none';
 
                     if (data.success) {
-                        // Data Fill up
                         movieTitle.innerText = data.title;
                         movieYear.innerText = `Year: ${data.year}`;
                         moviePoster.src = data.poster ? data.poster : 'https://via.placeholder.com/500x750?text=No+Poster';
                         
-                        // Quality Buttons dynamically update karein
                         qualityContainer.innerHTML = "";
                         
                         Object.keys(data.qualities).forEach((quality, index) => {
                             const btn = document.createElement('button');
-                            btn.className = `quality-btn ${index === 2 ? 'active' : ''}`; // Default 1080p active
+                            btn.className = `quality-btn ${index === 2 ? 'active' : ''}`; // Default 1080p Active
                             btn.innerText = quality.replace('_', ' ');
                             
-                            // Click karne par link badle
                             btn.onclick = () => {
                                 document.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('active'));
                                 btn.classList.add('active');
@@ -312,18 +319,16 @@
                             qualityContainer.appendChild(btn);
                         });
 
-                        // Default 1080p stream select karke play kar dena
+                        // Default Load 1080p Quality
                         videoPlayer.src = data.qualities['1080p'];
-                        
-                        // Unhide Layout
                         mainContent.style.display = 'flex';
                     } else {
-                        alert(data.message || "Movie nahi mili! Name sahi se type karein.");
+                        alert(data.message || "Movie nahi mili! Ek baar spelling check karein.");
                     }
                 })
                 .catch(err => {
                     loader.style.display = 'none';
-                    alert("Kuch gadbad hui server side pe!");
+                    alert("Kuch gadbad hui server side pe! Ensure karein aapka Pydroid backend chal raha hai aur CORS configurd hai.");
                     console.error(err);
                 });
         }
