@@ -3,224 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineMagic - Multi Quality Stream</title>
+    <title>CineMagic - High Speed Quality Stream</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body {
             background: linear-gradient(135deg, #0f172a, #1e1b4b, #311042);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            overflow-x: hidden;
+            color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; overflow-x: hidden;
         }
-
-        /* Glassmorphism Header */
-        header {
-            width: 100%;
-            max-width: 800px;
-            text-align: center;
-            margin: 40px 0 20px 0;
-        }
-
+        header { width: 100%; max-width: 800px; text-align: center; margin: 40px 0 20px 0; }
         header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(to right, #38bdf8, #c084fc, #f43f5e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
+            font-size: 2.5rem; font-weight: 700; background: linear-gradient(to right, #38bdf8, #c084fc, #f43f5e);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; letter-spacing: 1px;
         }
-
-        /* Search Section Glassmorphism */
         .search-container {
-            width: 100%;
-            max-width: 600px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
-            padding: 6px 10px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-            margin-bottom: 30px;
+            width: 100%; max-width: 600px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px;
+            padding: 6px 10px; display: flex; align-items: center; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); margin-bottom: 30px;
         }
-
-        .search-container:focus-within {
-            border-color: rgba(192, 132, 252, 0.5);
-            box-shadow: 0 0 20px rgba(192, 132, 252, 0.2);
-        }
-
-        .search-container input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: #fff;
-            font-size: 1rem;
-            padding: 12px 15px;
-        }
-
-        .search-container input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
+        .search-container input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 1rem; padding: 12px 15px; }
         .search-btn {
-            background: linear-gradient(135deg, #a855f7, #ec4899);
-            border: none;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: transform 0.2s, opacity 0.2s;
+            background: linear-gradient(135deg, #a855f7, #ec4899); border: none; color: white; padding: 12px 25px; border-radius: 40px; cursor: pointer; font-weight: 600;
         }
-
-        .search-btn:hover {
-            transform: scale(1.03);
-            opacity: 0.9;
-        }
-
-        /* Main Content Display Area */
-        .main-content {
-            width: 100%;
-            max-width: 800px;
-            display: none; /* Initially hidden */
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* Movie Details Card */
+        .main-content { width: 100%; max-width: 800px; display: none; flex-direction: column; gap: 20px; }
         .movie-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
-            padding: 20px;
-            display: flex;
-            gap: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 20px; display: flex; gap: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
         }
-
-        .movie-poster {
-            width: 120px;
-            height: 180px;
-            border-radius: 16px;
-            object-fit: cover;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .movie-info {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: 100%;
-        }
-
-        .movie-title {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #f8fafc;
-        }
-
-        .movie-year {
-            font-size: 1rem;
-            color: #94a3b8;
-            margin-bottom: 15px;
-        }
-
-        /* Quality Buttons */
-        .quality-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
+        .movie-poster { width: 120px; height: 180px; border-radius: 16px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.1); background: #222; }
+        .movie-info { display: flex; flex-direction: column; justify-content: center; width: 100%; }
+        .movie-title { font-size: 1.8rem; font-weight: 600; margin-bottom: 5px; color: #f8fafc; }
+        .movie-year { font-size: 1rem; color: #94a3b8; margin-bottom: 15px; }
+        .quality-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
         .quality-btn {
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #e2e8f0;
-            padding: 8px 16px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.15); color: #e2e8f0;
+            padding: 8px 16px; border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: all 0.3s ease;
         }
-
         .quality-btn:hover, .quality-btn.active {
-            background: #38bdf8;
-            color: #0f172a;
-            border-color: #38bdf8;
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
-            font-weight: 600;
+            background: #38bdf8; color: #0f172a; border-color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); font-weight: 600;
         }
-
-        /* Player Wrapper */
+        .download-btn {
+            background: linear-gradient(135deg, #22c55e, #10b981); border: none; color: white; padding: 12px 20px;
+            border-radius: 12px; cursor: pointer; font-weight: 600; text-align: center; text-decoration: none; display: inline-flex;
+            align-items: center; gap: 8px; width: fit-content; transition: transform 0.2s;
+        }
+        .download-btn:hover { transform: scale(1.03); box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
         .player-container {
-            width: 100%;
-            background: #000;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.05);
-            aspect-ratio: 16/9;
-            position: relative;
+            width: 100%; background: #000; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05); aspect-ratio: 16/9;
         }
-
-        .player-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* Loading Spinner */
+        .player-container iframe { width: 100%; height: 100%; border: none; }
         .loader {
-            display: none;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border-left-color: #a855f7;
-            animation: spin 1s linear infinite;
-            margin-top: 20px;
+            display: none; border: 4px solid rgba(255, 255, 255, 0.1); width: 50px; height: 50px; border-radius: 50%;
+            border-left-color: #a855f7; animation: spin 1s linear infinite; margin-top: 20px;
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Responsive Settings for Mobile */
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @media(max-width: 600px) {
-            .movie-card {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-            .movie-title {
-                font-size: 1.4rem;
-            }
-            .quality-container {
-                justify-content: center;
-            }
+            .movie-card { flex-direction: column; align-items: center; text-align: center; }
+            .quality-container { justify-content: center; }
+            .download-btn { margin: 0 auto; }
         }
     </style>
 </head>
@@ -228,20 +71,19 @@
 
     <header>
         <h1><i class="fa-solid fa-clapperboard"></i> CineMagic</h1>
-        <p style="color: #94a3b8;">Duniya ki koi bhi movie search karein har quality me!</p>
+        <p style="color: #94a3b8;">Maximum Bandwidth Protocol Enabled for Fast Streams</p>
     </header>
 
     <div class="search-container">
-        <input type="text" id="movieInput" placeholder="Movie ka naam likhein... (e.g., Inception, Shiddat)">
+        <input type="text" id="movieInput" placeholder="Movie ka naam likhein... (e.g., Shiddat, Inception)">
         <button class="search-btn" id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
     </div>
 
     <div class="loader" id="loader"></div>
 
     <div class="main-content" id="mainContent">
-        
         <div class="player-container">
-            <iframe id="videoPlayer" src="" allowfullscreen></iframe>
+            <iframe id="videoPlayer" src="" allowfullscreen loading="eager" referrerpolicy="no-referrer"></iframe>
         </div>
 
         <div class="movie-card">
@@ -250,12 +92,14 @@
                 <div class="movie-title" id="movieTitle">Movie Name</div>
                 <div class="movie-year" id="movieYear">Release Year</div>
                 
-                <p style="font-size: 0.85rem; color: #a855f7; margin-bottom: 10px; font-weight: 600;">CHOOSE QUALITY:</p>
-                <div class="quality-container" id="qualityContainer">
-                    </div>
+                <p style="font-size: 0.85rem; color: #a855f7; margin-bottom: 10px; font-weight: 600;">CHOOSE QUALITY (AUTO THREADING ENABLED):</p>
+                <div class="quality-container" id="qualityContainer"></div>
+                
+                <a href="#" target="_blank" rel="noreferrer" class="download-btn" id="downloadBtn">
+                    <i class="fa-solid fa-bolt"></i> High-Speed Download / Fullscreen
+                </a>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -268,31 +112,21 @@
         const movieTitle = document.getElementById('movieTitle');
         const movieYear = document.getElementById('movieYear');
         const qualityContainer = document.getElementById('qualityContainer');
+        const downloadBtn = document.getElementById('downloadBtn');
 
-        // Check window location to dynamically route requests to localhost if on GitHub
-        const BACKEND_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' 
-            ? '' 
-            : 'http://127.0.0.1:5000';
+        const BACKEND_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' ? '' : 'http://127.0.0.1:5000';
 
         searchBtn.addEventListener('click', performSearch);
-        
-        // Mobile & Desktop Keyboard Enter Fix
-        movieInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                performSearch();
-            }
-        });
+        movieInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') performSearch(); });
 
         function performSearch() {
             const query = movieInput.value.trim();
             if (!query) return alert("Bhai, movie ka naam toh likho!");
 
-            // UI Reset
             loader.style.display = 'block';
             mainContent.style.display = 'none';
             videoPlayer.src = "";
 
-            // Fetch Data smoothly
             fetch(`${BACKEND_URL}/api/search?query=${encodeURIComponent(query)}`)
                 .then(res => res.json())
                 .then(data => {
@@ -300,36 +134,38 @@
 
                     if (data.success) {
                         movieTitle.innerText = data.title;
-                        movieYear.innerText = `Year: ${data.year}`;
-                        moviePoster.src = data.poster ? data.poster : 'https://via.placeholder.com/500x750?text=No+Poster';
+                        movieYear.innerText = `Year: ${data.year || 'N/A'}`;
+                        
+                        moviePoster.src = data.poster && data.poster !== "N/A" ? data.poster : 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=500&auto=format&fit=crop';
                         
                         qualityContainer.innerHTML = "";
                         
                         Object.keys(data.qualities).forEach((quality, index) => {
                             const btn = document.createElement('button');
-                            btn.className = `quality-btn ${index === 2 ? 'active' : ''}`; // Default 1080p Active
+                            btn.className = `quality-btn ${index === 2 ? 'active' : ''}`;
                             btn.innerText = quality.replace('_', ' ');
                             
                             btn.onclick = () => {
                                 document.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('active'));
                                 btn.classList.add('active');
                                 videoPlayer.src = data.qualities[quality];
+                                downloadBtn.href = data.qualities[quality];
                             };
-
                             qualityContainer.appendChild(btn);
                         });
 
-                        // Default Load 1080p Quality
-                        videoPlayer.src = data.qualities['1080p'];
+                        const defaultLink = data.qualities['1080p'];
+                        videoPlayer.src = defaultLink;
+                        downloadBtn.href = defaultLink;
+                        
                         mainContent.style.display = 'flex';
                     } else {
-                        alert(data.message || "Movie nahi mili! Ek baar spelling check karein.");
+                        alert("Movie nahi mili! Ek baar spelling check karein.");
                     }
                 })
                 .catch(err => {
                     loader.style.display = 'none';
-                    alert("Kuch gadbad hui server side pe! Ensure karein aapka Pydroid backend chal raha hai aur CORS configurd hai.");
-                    console.error(err);
+                    alert("Backend server se connect nahi ho pa raha!");
                 });
         }
     </script>
