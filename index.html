@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMagic - Multi Quality Stream</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #311042);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Header */
+        header {
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            margin: 40px 0 20px 0;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #38bdf8, #c084fc, #f43f5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* Search Section Glassmorphism */
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        .search-container:focus-within {
+            border-color: rgba(192, 132, 252, 0.5);
+            box-shadow: 0 0 20px rgba(192, 132, 252, 0.2);
+        }
+
+        .search-container input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-size: 1rem;
+            padding: 12px 15px;
+        }
+
+        .search-container input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .search-btn:hover {
+            transform: scale(1.03);
+            opacity: 0.9;
+        }
+
+        /* Main Content Display Area */
+        .main-content {
+            width: 100%;
+            max-width: 800px;
+            display: none; /* Initially hidden */
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Movie Details Card */
+        .movie-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .movie-poster {
+            width: 120px;
+            height: 180px;
+            border-radius: 16px;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .movie-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .movie-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #f8fafc;
+        }
+
+        .movie-year {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-bottom: 15px;
+        }
+
+        /* Quality Buttons */
+        .quality-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .quality-btn {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .quality-btn:hover, .quality-btn.active {
+            background: #38bdf8;
+            color: #0f172a;
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+            font-weight: 600;
+        }
+
+        /* Player Wrapper */
+        .player-container {
+            width: 100%;
+            background: #000;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+            aspect-ratio: 16/9;
+            position: relative;
+        }
+
+        .player-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Loading Spinner */
+        .loader {
+            display: none;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border-left-color: #a855f7;
+            animation: spin 1s linear infinite;
+            margin-top: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Settings for Mobile */
+        @media(max-width: 600px) {
+            .movie-card {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .movie-title {
+                font-size: 1.4rem;
+            }
+            .quality-container {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><i class="fa-solid fa-clapperboard"></i> CineMagic</h1>
+        <p style="color: #94a3b8;">Duniya ki koi bhi movie search karein har quality me!</p>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="movieInput" placeholder="Movie ka naam likhein... (e.g., Inception, Jawan)">
+        <button class="search-btn" id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    </div>
+
+    <div class="loader" id="loader"></div>
+
+    <div class="main-content" id="mainContent">
+        
+        <div class="player-container">
+            <iframe id="videoPlayer" src="" allowfullscreen></iframe>
+        </div>
+
+        <div class="movie-card">
+            <img src="" alt="Poster" class="movie-poster" id="moviePoster">
+            <div class="movie-info">
+                <div class="movie-title" id="movieTitle">Movie Name</div>
+                <div class="movie-year" id="movieYear">Release Year</div>
+                
+                <p style="font-size: 0.85rem; color: #a855f7; margin-bottom: 10px; font-weight: 600;">CHOOSE QUALITY:</p>
+                <div class="quality-container" id="qualityContainer">
+                    </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const searchBtn = document.getElementById('searchBtn');
+        const movieInput = document.getElementById('movieInput');
+        const loader = document.getElementById('loader');
+        const mainContent = document.getElementById('mainContent');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const moviePoster = document.getElementById('moviePoster');
+        const movieTitle = document.getElementById('movieTitle');
+        const movieYear = document.getElementById('movieYear');
+        const qualityContainer = document.getElementById('qualityContainer');
+
+        searchBtn.addEventListener('click', performSearch);
+        movieInput.addEventListener('keypress', (e) => {
+            if (e.key === 'key' || e.keyCode === 13) performSearch();
+        });
+
+        function performSearch() {
+            const query = movieInput.value.trim();
+            if (!query) return alert("Bhai, movie ka naam toh likho!");
+
+            // UI Reset
+            loader.style.display = 'block';
+            mainContent.style.display = 'none';
+            videoPlayer.src = "";
+
+            // Fetch Data from Backend API
+            fetch(`/api/search?query=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    loader.style.display = 'none';
+
+                    if (data.success) {
+                        // Data Fill up
+                        movieTitle.innerText = data.title;
+                        movieYear.innerText = `Year: ${data.year}`;
+                        moviePoster.src = data.poster ? data.poster : 'https://via.placeholder.com/500x750?text=No+Poster';
+                        
+                        // Quality Buttons dynamically update karein
+                        qualityContainer.innerHTML = "";
+                        
+                        Object.keys(data.qualities).forEach((quality, index) => {
+                            const btn = document.createElement('button');
+                            btn.className = `quality-btn ${index === 2 ? 'active' : ''}`; // Default 1080p active
+                            btn.innerText = quality.replace('_', ' ');
+                            
+                            // Click karne par link badle
+                            btn.onclick = () => {
+                                document.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('active'));
+                                btn.classList.add('active');
+                                videoPlayer.src = data.qualities[quality];
+                            };
+
+                            qualityContainer.appendChild(btn);
+                        });
+
+                        // Default 1080p stream select karke play kar dena
+                        videoPlayer.src = data.qualities['1080p'];
+                        
+                        // Unhide Layout
+                        mainContent.style.display = 'flex';
+                    } else {
+                        alert(data.message || "Movie nahi mili! Name sahi se type karein.");
+                    }
+                })
+                .catch(err => {
+                    loader.style.display = 'none';
+                    alert("Kuch gadbad hui server side pe!");
+                    console.error(err);
+                });
+        }
+    </script>
+</body>
+</html>
