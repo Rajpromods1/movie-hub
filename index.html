@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineMagic Pro - Ad-Free Direct Links</title>
+    <title>CineMagic Pro - Instant Ad-Free Extractor</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -19,11 +19,15 @@
         }
         .search-container {
             width: 100%; max-width: 600px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50px; padding: 6px 10px; display: flex; align-items: center; margin-bottom: 30px;
+            border-radius: 50px; padding: 6px 10px; display: flex; align-items: center; margin-bottom: 20px;
         }
         .search-container input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 1rem; padding: 12px 15px; }
         .search-btn {
             background: linear-gradient(135deg, #10b981, #059669); border: none; color: white; padding: 12px 25px; border-radius: 40px; cursor: pointer; font-weight: 600;
+        }
+        .notice-box {
+            width: 100%; max-width: 600px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px; padding: 12px 15px; font-size: 0.85rem; color: #f59e0b; margin-bottom: 20px; text-align: center;
         }
         .results-container { width: 100%; max-width: 700px; display: none; flex-direction: column; gap: 15px; }
         .link-card {
@@ -35,10 +39,10 @@
         .movie-name { font-size: 1.05rem; font-weight: 600; margin-top: 5px; color: #e5e7eb; }
         .action-buttons { display: flex; gap: 10px; }
         .action-btn {
-            padding: 10px 16px; border-radius: 10px; text-decoration: none; font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;
+            padding: 10px 20px; border-radius: 10px; text-decoration: none; font-size: 0.9rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
         }
-        .btn-stream { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
-        .btn-download { background: #10b981; color: #fff; }
+        .btn-stream { background: #3b82f6; color: #fff; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3); }
+        .btn-download { background: #10b981; color: #fff; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); }
         .loader { display: none; border: 4px solid rgba(255,255,255,0.1); width: 45px; height: 45px; border-radius: 50%; border-left-color: #10b981; animation: spin 1s linear infinite; margin-top: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -47,12 +51,16 @@
 
     <header>
         <h1><i class="fa-solid fa-bolt"></i> CineMagic Pro</h1>
-        <p style="color: #94a3b8; margin-top: 5px;">Direct Multi-Site Link Extractor (No Popups / No Ads)</p>
+        <p style="color: #94a3b8; margin-top: 5px;">Bypass Ads & Popups - Direct Stream & Download Links</p>
     </header>
 
+    <div class="notice-box">
+        <i class="fa-solid fa-circle-info"></i> <b>Pro Tip:</b> Agar link open na ho, toh apne Browser ki Settings me jaakar <b>Pop-ups and Redirects</b> ko ek baar <b>Allow</b> kar dein!
+    </div>
+
     <div class="search-container">
-        <input type="text" id="movieInput" placeholder="Movie ka sahi naam likhein... (e.g., Shiddat, Avengers)">
-        <button class="search-btn" id="searchBtn">Extract Links</button>
+        <input type="text" id="movieInput" placeholder="Movie ka sahi naam likhein... (e.g., Shiddat, Inception)">
+        <button class="search-btn" id="searchBtn">Get Links</button>
     </div>
 
     <div class="loader" id="loader"></div>
@@ -76,7 +84,6 @@
             resultsContainer.style.display = 'none';
             resultsContainer.innerHTML = "";
 
-            // Dynamic host checking for backend pipeline
             const backendHost = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' ? '' : 'http://127.0.0.1:5000';
 
             fetch(`${backendHost}/api/scrape?query=${encodeURIComponent(query)}`)
@@ -87,27 +94,36 @@
                         data.results.forEach(item => {
                             const card = document.createElement('div');
                             card.className = 'link-card';
+                            
+                            // Direct Bypass URLs Injection
                             card.innerHTML = `
                                 <div>
-                                    <span class="source-tag">${item.site}</span>
+                                    <span class="source-tag" style="background:${item.site.includes('Vegamovies') ? '#8b5cf6' : '#3b82f6'}">${item.site}</span>
                                     <div class="movie-name">${item.title}</div>
                                 </div>
                                 <div class="action-buttons">
-                                    <a href="${item.url}" target="_blank" class="action-btn btn-stream"><i class="fa-solid fa-play"></i> Stream</a>
-                                    <a href="${item.url}" target="_blank" download class="action-btn btn-download"><i class="fa-solid fa-download"></i> Direct DL</a>
+                                    <button onclick="openDirectLink('${item.url}')" class="action-btn btn-stream"><i class="fa-solid fa-play"></i> Watch / Play</button>
                                 </div>
                             `;
                             resultsContainer.appendChild(card);
                         });
                         resultsContainer.style.display = 'flex';
                     } else {
-                        alert("Koi direct link nahi nikal paya, spelling check karein!");
+                        alert("Koi direct link nahi mila, please naam ki spelling check karein!");
                     }
                 })
                 .catch(err => {
                     loader.style.display = 'none';
-                    alert("Aapka Python backend running nahi hai! Pydroid me play button dabayein.");
+                    alert("Aapka Python backend server off hai! Pydroid app khol kar pehle code RUN kijiye.");
                 });
+        }
+
+        // Deep Clean JavaScript redirection window to bypass Brave/Chrome tracking shield
+        function openDirectLink(url) {
+            const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+            if (!newWindow) {
+                alert("Bhai, aapke browser ne page block kar diya! Browser ke top right corner (ya settings) me jaakar 'Always Allow Pop-ups' par click kijiye.");
+            }
         }
     </script>
 </body>
