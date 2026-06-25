@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineMagic - Realtime Super Fast Stream</title>
+    <title>CineMagic - Universal Movie Player</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -28,6 +28,14 @@
             background: linear-gradient(135deg, #a855f7, #ec4899); border: none; color: white; padding: 12px 25px; border-radius: 40px; cursor: pointer; font-weight: 600;
         }
         .main-content { width: 100%; max-width: 800px; display: none; flex-direction: column; gap: 20px; }
+        
+        /* Fixed Player Box to prevent loading issues */
+        .player-container {
+            width: 100%; background: #05050a; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05); aspect-ratio: 16/9; position: relative;
+        }
+        .player-container iframe { width: 100%; height: 100%; border: none; background: #000; }
+        
         .movie-card {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 20px; display: flex; gap: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
@@ -36,6 +44,7 @@
         .movie-info { display: flex; flex-direction: column; justify-content: center; width: 100%; }
         .movie-title { font-size: 1.8rem; font-weight: 600; margin-bottom: 5px; color: #f8fafc; }
         .movie-year { font-size: 1rem; color: #94a3b8; margin-bottom: 15px; }
+        
         .quality-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
         .quality-btn {
             background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.15); color: #e2e8f0;
@@ -50,16 +59,13 @@
             align-items: center; gap: 8px; width: fit-content; transition: transform 0.2s;
         }
         .download-btn:hover { transform: scale(1.03); box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
-        .player-container {
-            width: 100%; background: #000; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.05); aspect-ratio: 16/9;
-        }
-        .player-container iframe { width: 100%; height: 100%; border: none; }
+        
         .loader {
             display: none; border: 4px solid rgba(255, 255, 255, 0.1); width: 50px; height: 50px; border-radius: 50%;
             border-left-color: #a855f7; animation: spin 1s linear infinite; margin-top: 20px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
         @media(max-width: 600px) {
             .movie-card { flex-direction: column; align-items: center; text-align: center; }
             .quality-container { justify-content: center; }
@@ -71,7 +77,7 @@
 
     <header>
         <h1><i class="fa-solid fa-clapperboard"></i> CineMagic</h1>
-        <p style="color: #94a3b8;">Duniya ki koi bhi movie search karein—Instant Play & Download</p>
+        <p style="color: #94a3b8;">Hollywood + Bollywood Universal Multi-Server Streaming</p>
     </header>
 
     <div class="search-container">
@@ -83,7 +89,7 @@
 
     <div class="main-content" id="mainContent">
         <div class="player-container">
-            <iframe id="videoPlayer" src="" allowfullscreen loading="eager" referrerpolicy="no-referrer"></iframe>
+            <iframe id="videoPlayer" src="" allowfullscreen referrerpolicy="no-referrer"></iframe>
         </div>
 
         <div class="movie-card">
@@ -92,11 +98,11 @@
                 <div class="movie-title" id="movieTitle">Movie Name</div>
                 <div class="movie-year" id="movieYear">Release Year</div>
                 
-                <p style="font-size: 0.85rem; color: #a855f7; margin-bottom: 10px; font-weight: 600;">CHOOSE QUALITY:</p>
+                <p style="font-size: 0.85rem; color: #a855f7; margin-bottom: 10px; font-weight: 600;">IF BLANK, SWITCH SERVERS BELOW:</p>
                 <div class="quality-container" id="qualityContainer"></div>
                 
                 <a href="#" target="_blank" rel="noreferrer" class="download-btn" id="downloadBtn">
-                    <i class="fa-solid fa-bolt"></i> Play Fullscreen / Download Movie
+                    <i class="fa-solid fa-bolt"></i> Open Server in Fullscreen / Download
                 </a>
             </div>
         </div>
@@ -125,75 +131,63 @@
             mainContent.style.display = 'none';
             videoPlayer.src = "";
 
-            // Direct Multi-Source Fetching without crashing
+            // Free Public API Endpoint
             fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(query)}&apikey=237730e7`)
                 .then(res => res.json())
                 .then(data => {
+                    loader.style.display = 'none';
+
                     if (data.Response === "True" && data.Search.length > 0) {
-                        const movie = data.Search[0]; // Sabse accurate result
+                        const movie = data.Search[0];
                         const imdbID = movie.imdbID;
 
-                        // UI Dynamic Data Population
                         movieTitle.innerText = movie.Title;
                         movieYear.innerText = `Year: ${movie.Year}`;
                         
-                        // Exact actual movie poster fix
-                        moviePoster.src = movie.Poster !== "N/A" ? movie.Poster : 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=500&auto=format&fit=crop';
-                        
-                        // Servers setup with auto multi-routing keys
-                        const qualities = {
-                            "Auto Stream": `https://vidsrc.xyz/embed/movie/${imdbID}`,
-                            "Server 1 (Fast)": `https://vidsrc.me/embed/movie/${imdbID}`,
-                            "Server 2 (HD)": `https://vidsrc.to/embed/movie/${imdbID}`,
-                            "Server 3 (4K)": `https://embed.su/embed/movie/${imdbID}`
+                        // Poster fixing block
+                        if(movie.Poster && movie.Poster !== "N/A") {
+                            moviePoster.src = movie.Poster;
+                        } else {
+                            moviePoster.src = "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=500";
+                        }
+
+                        // Bollywood and Hollywood dedicated multi-servers
+                        const servers = {
+                            "Server Hindi 1": `https://embed.smashystream.com/playere.php?imdb=${imdbID}`,
+                            "Server Hindi 2": `https://www.2embed.cc/embed/${imdbID}`,
+                            "Server Auto HD": `https://vidsrc.xyz/embed/movie/${imdbID}`,
+                            "Server Multi 4K": `https://embed.su/embed/movie/${imdbID}`
                         };
 
                         qualityContainer.innerHTML = "";
                         
-                        Object.keys(qualities).forEach((qName, index) => {
+                        Object.keys(servers).forEach((sName, index) => {
                             const btn = document.createElement('button');
                             btn.className = `quality-btn ${index === 0 ? 'active' : ''}`;
-                            btn.innerText = qName;
+                            btn.innerText = sName;
                             
                             btn.onclick = () => {
                                 document.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('active'));
                                 btn.classList.add('active');
-                                videoPlayer.src = qualities[qName];
-                                downloadBtn.href = qualities[qName];
+                                videoPlayer.src = servers[sName];
+                                downloadBtn.href = servers[sName];
                             };
                             qualityContainer.appendChild(btn);
                         });
 
-                        // Default Loading
-                        videoPlayer.src = qualities["Auto Stream"];
-                        downloadBtn.href = qualities["Auto Stream"];
+                        // Default load Server Hindi 1
+                        videoPlayer.src = servers["Server Hindi 1"];
+                        downloadBtn.href = servers["Server Hindi 1"];
                         
-                        loader.style.display = 'none';
                         mainContent.style.display = 'flex';
                     } else {
-                        // If OMDb fails, use secondary direct server resolver
-                        fallbackDirectStream(query);
+                        alert("Movie nahi mili! Ek baar spelling sahi se check karein.");
                     }
                 })
                 .catch(err => {
-                    fallbackDirectStream(query);
+                    loader.style.display = 'none';
+                    alert("Network temporary slow hai, dubara try karein!");
                 });
-        }
-
-        function fallbackDirectStream(query) {
-            movieTitle.innerText = query.toUpperCase();
-            movieYear.innerText = "Year: Dynamic Fetching";
-            moviePoster.src = 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=500&auto=format&fit=crop';
-            
-            // Direct text resolver string
-            const finalLink = `https://vidsrc.me/embed/movie/${encodeURIComponent(query.toLowerCase())}`;
-            
-            qualityContainer.innerHTML = "<button class='quality-btn active'>Direct Server Stream</button>";
-            videoPlayer.src = finalLink;
-            downloadBtn.href = finalLink;
-            
-            loader.style.display = 'none';
-            mainContent.style.display = 'flex';
         }
     </script>
 </body>
